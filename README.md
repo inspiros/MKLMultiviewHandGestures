@@ -107,15 +107,15 @@ Execute file `run_gesture_classification.py`:
 | `git diff` | Show file differences that **haven't been** staged |
 
 
-> Currently supported arguments:
 | Argument | Meaning | eg. |
 | --- | --- | --- |
 | `kinect_train` | Kinect train | K1 |
 | `kinect_test` | Kinect test | K2 |
-| `iter_rgb` | Number of iteration of finetuning C3D for extracting RGB features | 800 |
-| `iter_depth` | Number of iteration of finetuning C3D for extracting Depth features | 1600 |
-| `dataset_root` | Overwriting `DATASET_ROOT` set in `configs.py` | /dir |
+| `iter_rgb` | Number of iteration of finetuning RGB-C3D| 800 |
+| `iter_depth` | Number of iteration of finetuning D-C3D| 1600 |
+| `dataset_root` | Overwriting `DATASET_ROOT` set in `configs.py` | \/dir |
 | `kernels` | Kernels configurations set in `configs.py`, accepting only keywords in `assignable_names` | linear |
+
 
 - Run multiple commands sequentially:
 -- Modify `evaluation_procedure` file
