@@ -83,16 +83,16 @@ def polynomial_concatenate(X, L=None): # Kernel computing call-back for concaten
 	return pairwise.polynomial_kernel(X, L, degree=4)
 
 polynomial_params = Params(name = 'polynomial', # name of the kernels configuration
-				assignable_names = ['poly', 'polynomial'], # accepted names when you run command, eg: --kernels=poly
-				kernel_func_rgb = polynomial_rgb,
-				kernel_func_depth = polynomial_depth,
-				kernel_func_concatenate = polynomial_concatenate,
-				C_mkl = 0.25, # C of base learner of MKL
-				C_rgb = None, # (Optional) C of SVM on rgb, equals C_mkl if None
-				C_depth = None, # (Optional) C of SVM on depth, equals C_mkl if None
-				C_concatenate = 10, # (Optional) C of SVM on concatenated features, equals C_mkl if None
-				lam_mkl = None # (Optional) lamda [0,1] of EasyMKL, 0.0 if None
-					)
+			assignable_names = ['poly', 'polynomial'], # accepted names when you run command, eg: --kernels=poly
+			kernel_func_rgb = polynomial_rgb,
+			kernel_func_depth = polynomial_depth,
+			kernel_func_concatenate = polynomial_concatenate,
+			C_mkl = 0.25, # C of base learner of MKL
+			C_rgb = None, # (Optional) C of SVM on rgb, equals C_mkl if None
+			C_depth = None, # (Optional) C of SVM on depth, equals C_mkl if None
+			C_concatenate = 10, # (Optional) C of SVM on concatenated features, equals C_mkl if None
+			lam_mkl = None # (Optional) lamda [0,1] of EasyMKL, 0.0 if None
+			)
 
 CONFIGS.append(polynomial_params.to_program_config())
 ```
