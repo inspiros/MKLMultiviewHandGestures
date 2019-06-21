@@ -4,16 +4,16 @@ Dedicated to run on FC features formatted by code in `/media/data3/tranhoangnhat
 FC features folder
 ```python
 dataset
-│	RGB_K1_K1
+└───RGB_K1_K1
 │	...
 └───RGB_K3_K3 '''[Modality]_[Kinect train]_[Kinect test]'''
-│	│	Binh
+│	└───Binh
 │	└───Giang '''[Test subject]'''
 │		└───feature
-│			│	iter_100
+│			└───iter_100
 │			│	...
 │			└───iter_800 '''iter_[num of iteration]'''
-│				│	Binh
+│				└───Binh
 │				└───Giang
 │				│	└───1 '''[gesture number]'''
 │				│		└───1 '''[setup index]'''
@@ -21,8 +21,8 @@ dataset
 │				│			└───000001.fc7 '''[FC7 feature]'''
 │				│			└───000001.prob '''[Probability]'''
 │				│	...
-│	Depth_K1_K1
-│	Depth_K2_K2   
+└───Depth_K1_K1
+└───Depth_K2_K2   
 └───Depth_K3_K3
 │	└─── '''<similar format>'''
 │	...
