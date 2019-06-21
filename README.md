@@ -115,6 +115,9 @@ Currently supported arguments:
 
 
 - Run multiple commands sequentially:
+
 -- Modify `evaluation_procedure` file
+
 -- Execute it from terminal `./evaluation_procedure`
+
 > Run `chmod 777 evaluation_procedure` if not working
