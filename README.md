@@ -100,7 +100,14 @@ CONFIGS.append(polynomial_params.to_program_config())
 Execute file `run_gesture_classification.py`:
 - Run command manually from terminal with the following format:
 `python3 run_gesture_classification.py --kinect_train=K3 --kinect_test=K3 --iter_rgb=800 --iter_depth=1600 --kernels=linear`
-Currently supported arguments:
+
+| Command | Description |
+| --- | --- |
+| `git status` | List all *new or modified* files |
+| `git diff` | Show file differences that **haven't been** staged |
+
+
+> Currently supported arguments:
 | Argument | Meaning | eg. |
 | --- | --- | --- |
 | `kinect_train` | Kinect train | K1 |
@@ -109,6 +116,7 @@ Currently supported arguments:
 | `iter_depth` | Number of iteration of finetuning C3D for extracting Depth features | 1600 |
 | `dataset_root` | Overwriting `DATASET_ROOT` set in `configs.py` | /dir |
 | `kernels` | Kernels configurations set in `configs.py`, accepting only keywords in `assignable_names` | linear |
+
 - Run multiple commands sequentially:
 -- Modify `evaluation_procedure` file
 -- Execute it from terminal `./evaluation_procedure`
