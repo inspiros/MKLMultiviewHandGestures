@@ -99,6 +99,7 @@ CONFIGS.append(polynomial_params.to_program_config())
 ### Run
 Execute file `run_gesture_classification.py`:
 - Run command manually from terminal with the following format:
+
 `python3 run_gesture_classification.py --kinect_train=K3 --kinect_test=K3 --iter_rgb=800 --iter_depth=1600 --kernels=linear`
 
 Currently supported arguments:
