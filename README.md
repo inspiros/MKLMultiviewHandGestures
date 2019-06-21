@@ -1,5 +1,5 @@
 # MKL evaluation code
-Dedicated to run on FC features formatted by code in `/media/data3/tranhoangnhat/c3d_luanvan`
+Dedicated to run on FC features formatted by code from `/media/data3/tranhoangnhat/c3d_luanvan`
 ### Input
 FC features folder
 ```python
