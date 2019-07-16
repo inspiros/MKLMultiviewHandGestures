@@ -10,13 +10,13 @@ from sklearn.preprocessing import normalize
 from MKL.algorithms import EasyMKL
 from MKL.multiclass import OneVsRestMKLClassifier
 
-from configs import CONFIGS
+from configs import DATASET_ROOT, CONFIGS
 from sklearn.svm import SVC
 
 from evaluate import *
 
 def parse_args():
-	parser = argparse.ArgumentParser(description='MKL')
+	parser = argparse.ArgumentParser(description='MultiviewHandGestures MKL Classification')
 	parser.add_argument('--kinect_train', type=str, default=None,
 	                        help='Kinect train.')
 	parser.add_argument('--kinect_test', type=str, default=None,
@@ -43,8 +43,9 @@ def parse_args():
 	                        help='Depth folder.')
 
 	parser.add_argument('--kernels', type=str, default=None,
-	                        help='Kernel.')
+	                        help='Kernel.', required=True)
 	return parser.parse_args()
+
 
 args = parse_args()
 
@@ -270,7 +271,7 @@ Program begins
 '''
 for config in CONFIGS:
 	if config.is_assignable(KERNEL_TYPE):
-		print('[MKL Classification Begins]', config.name)
+		print('[MultiviewHandGestures MKL Classification]', config.name)
 		result = cross_evaluation(gesture_datasets, *config.to_params())
 		summary(result, os.path.join(GESTURE_SUBDIR, KINECT_TRAIN + '_' + KINECT_TEST + '_' + KERNEL_TYPE.lower()))
 		break

@@ -6,6 +6,8 @@ from sklearn.metrics import pairwise
 DATASET_ROOT = 'dataset'
 CONFIGS = []
 
+LAYER = 'fc6'
+
 '''
 Linear config
 '''

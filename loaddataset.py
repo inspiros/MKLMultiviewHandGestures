@@ -1,4 +1,4 @@
-import gestureconfig
+import configs
 import blob
 import numpy as np
 import pickle
@@ -43,7 +43,7 @@ class GestureDatasetLoader:
 					classdir = os.path.join(subject_dir, cldir)
 					for sudir in os.listdir(classdir):
 						setupdir = os.path.join(classdir, sudir)
-						fc_file = os.path.join(setupdir, '000001.' + gestureconfig.layer)
+						fc_file = os.path.join(setupdir, '000001.' + configs.LAYER)
 						data = blob.load_np_array(fc_file)
 
 						rc = Record()
