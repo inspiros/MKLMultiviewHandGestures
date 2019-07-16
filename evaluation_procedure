@@ -1,5 +1,5 @@
 
-python3 run_gesture_classification.py --kinect_train=K3 --kinect_test=K3 --iter_rgb=800 --iter_depth=1600 --kernels=linear
-python3 run_gesture_classification.py --kinect_train=K3 --kinect_test=K3 --iter_rgb=800 --iter_depth=1600 --kernels=rbf
-python3 run_gesture_classification.py --kinect_train=K3 --kinect_test=K3 --iter_rgb=800 --iter_depth=1600 --kernels=laplacian
+python3 run_gesture_classification.py --kinect_train=K3 --kinect_test=K3 --iter_rgb=800 --iter_depth=800 --kernels=linear
+npython3 run_gesture_classification.py --kinect_train=K3 --kinect_test=K3 --iter_rgb=800 --iter_depth=1600 --kernels=rbf
+npython3 run_gesture_classification.py --kinect_train=K3 --kinect_test=K3 --iter_rgb=800 --iter_depth=1600 --kernels=laplacian
 
