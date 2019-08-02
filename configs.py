@@ -1,70 +1,51 @@
-from program_config import ProgramConfig
 from params import Params
-from kernel import Kernel
 from sklearn.metrics import pairwise
 
-DATASET_ROOT = 'dataset'
-CONFIGS = []
-
+DATASET_ROOT = '/media/inspiros/Shared/datasets/MultiviewGesture'
 LAYER = 'fc6'
 
+# Put every configurations here!
 '''
 Linear config
 '''
-def linear(X, L=None):
-	return pairwise.linear_kernel(X, L)
-
-linear_params = Params(name = 'linear',
-					assignable_names = ['lin', 'linear'],
-					kernel_func_rgb = linear,
-					kernel_func_depth = linear,
-					kernel_func_concatenate = linear,
-					C_mkl = 0.0001,
-					C_concatenate = 100
-					)
-
-CONFIGS.append(linear_params.to_program_config())
-
+linear_params = Params(name='linear',
+                       assignable_names=['lin', 'linear'],
+                       kernel_func_rgb=lambda X, L=None: pairwise.linear_kernel(X, L),
+                       kernel_func_depth=lambda X, L=None: pairwise.linear_kernel(X, L),
+                       kernel_func_concatenate=lambda X, L=None: pairwise.linear_kernel(X, L),
+                       C_mkl=0.0001,
+                       C_concatenate=100,
+                       lam_mkl=0.0,
+                       late_fusion_weight_rgb=0.8,
+                       late_fusion_weight_depth=0.2
+                       )
 
 '''
 RBF config
 '''
-def rbf_rgb(X, L=None): #0.000001
-	return pairwise.rbf_kernel(X, L, gamma=0.000001)
-def rbf_depth(X, L=None): #0.000001
-	return pairwise.rbf_kernel(X, L, gamma=0.000001)
-def rbf_concatenate(X, L=None):
-	return pairwise.rbf_kernel(X, L, gamma=0.1)
-
-rbf_params = Params(name = 'rbf',
-					assignable_names = ['rbf', 'gaussian'],
-					kernel_func_rgb = rbf_rgb,
-					kernel_func_depth = rbf_depth,
-					kernel_func_concatenate = rbf_concatenate,
-					C_mkl = 100,
-					C_concatenate = 100
-					)
-
-CONFIGS.append(rbf_params.to_program_config())
-
+rbf_params = Params(name='rbf',
+                    assignable_names=['rbf', 'gaussian'],
+                    kernel_func_rgb=lambda X, L=None: pairwise.rbf_kernel(X, L, gamma=0.000001),
+                    kernel_func_depth=lambda X, L=None: pairwise.rbf_kernel(X, L, gamma=0.000001),
+                    kernel_func_concatenate=lambda X, L=None: pairwise.rbf_kernel(X, L, gamma=0.1),
+                    C_mkl=100,
+                    C_concatenate=100,
+                    lam_mkl=1.0,
+                    late_fusion_weight_rgb=0.8,
+                    late_fusion_weight_depth=0.2
+                    )
 
 '''
 Laplacian config
 '''
-def laplacian_rgb(X, L=None): #0.00001
-	return pairwise.laplacian_kernel(X, L, gamma=0.00001)
-def laplacian_depth(X, L=None): #0.00001
-	return pairwise.laplacian_kernel(X, L, gamma=0.00001)
-def laplacian_concatenate(X, L=None):
-	return pairwise.laplacian_kernel(X, L, gamma=0.001)
-
-laplacian_params = Params(name = 'laplacian',
-					assignable_names = ['lap', 'laplacian'],
-					kernel_func_rgb = laplacian_rgb,
-					kernel_func_depth = laplacian_depth,
-					kernel_func_concatenate = laplacian_concatenate,
-					C_mkl = 100,
-					C_concatenate = 100
-					)
-
-CONFIGS.append(laplacian_params.to_program_config())
+laplacian_params = Params(name='laplacian',
+                          assignable_names=['lap', 'laplacian'],
+                          kernel_func_rgb=lambda X, L=None: pairwise.laplacian_kernel(X, L, gamma=0.00001),
+                          kernel_func_depth=lambda X, L=None: pairwise.laplacian_kernel(X, L, gamma=0.00001),
+                          kernel_func_concatenate=lambda X, L=None: pairwise.laplacian_kernel(X, L, gamma=0.001),
+                          C_mkl=100,
+                          C_concatenate=100,
+                          lam_mkl=0.5,
+                          late_fusion_weight_rgb=0.8,
+                          late_fusion_weight_depth=0.2
+                          )
