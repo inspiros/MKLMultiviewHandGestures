@@ -1,5 +1,5 @@
 # MKL evaluation on MultiviewHandGestures
-Dedicated to run on FC features formatted by code in `/media/data3/tranhoangnhat/c3d_luanvan`
+Dedicated to run on FC features formatted by code in `/media/data3/tranhoangnhat/c3d_luanvan`. </br>
 Download extracted features folders to local computer or push this code folder to server.
 ### Input
 FC features folder
@@ -92,31 +92,31 @@ polynomial_params = Params(name = 'polynomial', # name of the kernels configurat
 					C_rgb = None, # (Optional) C of SVM on rgb, equals C_mkl if None
 					C_depth = None, # (Optional) C of SVM on depth, equals C_mkl if None
 					C_concatenate = 10, # (Optional) C of SVM on concatenated features, equals C_mkl if None
-					lam_mkl = None # (Optional) lamda [0,1] of EasyMKL, 0.0 if None
+					lam_mkl = None # (Optional) lamda [0,1] of EasyMKL, 0.0 if None,
+					late_fusion_weight_rgb=0.75,
+					late_fusion_weight_depth=0.25
 					)
-
-CONFIGS.append(polynomial_params.to_program_config())
 ```
 ### Run
 Execute file `run_gesture_classification.py`:
-- Run command manually from terminal with the following format:
+- Run command manually from terminal with the following format: </br>
 `python3 run_gesture_classification.py --kinect_train=K3 --kinect_test=K3 --iter_rgb=800 --iter_depth=1600 --kernels=linear`
 
-> Currently supported arguments:
+Currently supported arguments: </br>
 
-> |Argument|Meaning|eg.|
-> |---|---|---|
-> |`kinect_train`|Kinect train|K1|
-> |`kinect_test`|Kinect test|K2|
-> |`iter_rgb`|Number of iteration of finetuning C3D for extracting RGB features|800|
-> |`iter_depth`|Number of iteration of finetuning C3D for extracting Depth features|1600|
-> |`dataset_root`|Overwriting `DATASET_ROOT` set in `configs.py`|/dir|
-> |`confusion_matrix`|Export confusion matrix or not, default True|True|
-> |`classification_report`|Export classification report or not, default True|True|
-> |`kernels`|Kernels configurations set in `configs.py`, accepting only keywords in `assignable_names`|linear|
+|Argument|Meaning|eg.|
+|---|---|---|
+|`kinect_train`|Kinect train|K1|
+|`kinect_test`|Kinect test|K2|
+|`iter_rgb`|Number of iteration of finetuning C3D for extracting RGB features|800|
+|`iter_depth`|Number of iteration of finetuning C3D for extracting Depth features|1600|
+|`dataset_root`|Overwriting `DATASET_ROOT` set in `configs.py`|/dir|
+|`confusion_matrix`|Export confusion matrix or not, default True|True|
+|`classification_report`|Export classification report or not, default True|True|
+|`kernels`|Kernels configurations set in `configs.py`, accepting only keywords in `assignable_names`|linear|
 
 
-- Run multiple commands sequentially:
--- Modify `evaluation_procedure` file
--- Execute it from terminal `./evaluation_procedure`
+- Run multiple commands sequentially: </br>
+-- Modify `evaluation_procedure` file </br>
+-- Execute it from terminal `./evaluation_procedure` </br>
 > Run `chmod 777 evaluation_procedure` if not working
