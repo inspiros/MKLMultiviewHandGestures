@@ -38,7 +38,6 @@ class EasyMKL(BaseEstimator, ClassifierMixin, MKL):
         else:
             self.lam = 0.1
 
-        
     def _arrange_kernel(self):
         Y = [1 if y==self.classes_[1] else -1 for y in self.Y]
         n_sample = len(self.Y)

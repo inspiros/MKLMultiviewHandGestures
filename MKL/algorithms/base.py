@@ -26,7 +26,7 @@ class MKL(object):
 		self.multiclass_strategy = multiclass_strategy
 		self.max_iter = max_iter
 		self.verbose = verbose
-		self.estimator.kernel='precomputed'
+		self.estimator.kernel = 'precomputed'
 		self.is_fitted = False
 		self.multiclass_ = None
 		self.classes_ = None

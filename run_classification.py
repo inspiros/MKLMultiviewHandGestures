@@ -1,5 +1,6 @@
 from __future__ import print_function
 from collections import OrderedDict
+
 from sklearn.svm import SVC
 from sklearn.preprocessing import normalize
 from MKL.algorithms import EasyMKL
@@ -10,6 +11,7 @@ from evaluate import *
 import numpy as np
 import datapersistant
 import argparse
+
 CONFIGURATIONS = __import__('configs')
 
 
@@ -43,36 +45,6 @@ def parse_args():
     parser.add_argument('--kernels', type=str, default=None,
                         help='Kernel.', required=True)
     return parser.parse_args()
-
-
-args = parse_args()
-
-DATASET_ROOT = args.dataset_root if args.dataset_root is not None else CONFIGURATIONS.DATASET_ROOT
-
-EXPORT_LEAVE_ONE_OUT = args.export_leave_one_out
-EXPORT_OVERALL = args.export_overall
-CONFUSION_MATRIX = args.confusion_matrix
-CLASSIFICATION_REPORT = args.classification_report
-
-KINECT_TRAIN = args.kinect_train
-KINECT_TEST = args.kinect_test
-
-KERNEL_TYPE = args.kernels
-
-MODAL_1 = args.rgb
-MODAL_2 = args.depth
-
-ITER_1 = args.iter_rgb
-ITER_2 = args.iter_depth
-GESTURE_SUBDIR = os.path.join(MODAL_1 + '_' + str(ITER_1) + ' ' + MODAL_2 + '_' + str(ITER_2))
-
-rgb_data = datapersistant.persistGestureDataset(
-    os.path.join(DATASET_ROOT, MODAL_1 + '_' + KINECT_TRAIN + '_' + KINECT_TEST),
-    'gesture_' + MODAL_1 + '_' + KINECT_TRAIN + '_' + KINECT_TEST, ITER_1, False)
-depth_data = datapersistant.persistGestureDataset(
-    os.path.join(DATASET_ROOT, MODAL_2 + '_' + KINECT_TRAIN + '_' + KINECT_TEST),
-    'gesture_' + MODAL_2 + '_' + KINECT_TRAIN + '_' + KINECT_TEST, ITER_2, False)
-gesture_datasets = [rgb_data, depth_data]
 
 
 def leave_one_out(target, datasets):
@@ -139,21 +111,17 @@ def cross_evaluation(datasets, **kwargs):
     """
     Leave one out to test and train on others.
     """
-    global GESTURE_SUBDIR
-    global EXPORT_LEAVE_ONE_OUT
-    global EXPORT_OVERALL
-    global KINECT_TRAIN
-    global KINECT_TEST
-    global KERNEL_TYPE
     SAVE_SUB_DIR = os.path.join(GESTURE_SUBDIR, KINECT_TRAIN + '_' + KINECT_TEST + '_' + KERNEL_TYPE.lower())
 
-    kernels = kwargs['kernels']
+    kernels = kwargs['kernels_mkl']
+    kernels_svm = kwargs['kernels_svm']
     kernel_concatenate = kwargs['kernel_concatenate']
     C_mkl = kwargs['C_mkl']
     C_svms = kwargs['C_svms']
     C_concatenate = kwargs['C_concatenate']
     lam_mkl = kwargs['lam_mkl']
-    Late_fusion_weights = kwargs['late_fusion_weights']
+    late_fusion_weights_sum = kwargs['late_fusion_weights_sum']
+    late_fusion_weights_max = kwargs['late_fusion_weights_max']
 
     # Get subjects list
     subject_list = []
@@ -193,16 +161,19 @@ def cross_evaluation(datasets, **kwargs):
 
         KLtr = [None for _ in Xtrs]
         KLte = [None for _ in Xtes]
+        KLtr_svm = KLtr.copy()
+        KLte_svm = KLte.copy()
         for i in range(len(Xtrs)):
             KLtr[i] = kernels[i](Xtrs[i])
             KLte[i] = kernels[i](Xtes[i], Xtrs[i])
+            KLtr_svm[i] = kernels_svm[i](Xtrs[i])
+            KLte_svm[i] = kernels_svm[i](Xtes[i], Xtrs[i])
 
         # ---------------------------
         # MKL
         # ---------------------------
-        base_learner = SVC(C=C_mkl, tol=0.0001, kernel='precomputed')
-        clf = EasyMKL(estimator=base_learner, lam=lam_mkl, max_iter=1000, verbose=True)
-        mkl = OneVsRestMKLClassifier(clf)
+        mkl = OneVsRestMKLClassifier(
+            EasyMKL(estimator=SVC(C=C_mkl, tol=0.0001, kernel='precomputed'), lam=lam_mkl, verbose=False), verbose=False)
 
         # Fit and eval MKL
         mkl.fit(KLtr, ytr)
@@ -235,15 +206,17 @@ def cross_evaluation(datasets, **kwargs):
         # ---------------------------
         # Single modality
         # ---------------------------
-        decisions = []
+        decisions_sum, decisions_max = [], []
         for i in range(len(datasets)):
             # ---------------------------
             # SVM
             # ---------------------------
             clf = SVC(C=C_svms[i], tol=0.0001, kernel='precomputed')
-            clf.fit(KLtr[i], ytr)
-            y_pred = clf.predict(KLte[i])
-            decisions.append(clf.decision_function(KLte[i]) * Late_fusion_weights[i])
+            clf.fit(KLtr_svm[i], ytr)
+            y_pred = clf.predict(KLte_svm[i])
+            y_dec = clf.decision_function(KLte_svm[i])
+            decisions_sum.append(y_dec * late_fusion_weights_sum[i])
+            decisions_max.append(y_dec * late_fusion_weights_max[i])
             svm_score = f1(yte, y_pred)
             leave_one_out_scores.update({'SVM ' + kernels[i].name: svm_score})
 
@@ -258,7 +231,7 @@ def cross_evaluation(datasets, **kwargs):
         # ---------------------------
         # Sum Late fusion
         # ---------------------------
-        y_pred = np.argmax(np.sum(np.array(decisions, dtype=np.float32), axis=0), axis=1).astype(np.int) + 1
+        y_pred = np.argmax(np.sum(np.array(decisions_sum, dtype=np.float32), axis=0), axis=1).astype(np.int) + 1
         save_results(y_true=yte, y_pred=y_pred,
                      verbose_string='Sum Late fusion',
                      title='Sum Late fusion on ' + subject,
@@ -269,7 +242,7 @@ def cross_evaluation(datasets, **kwargs):
         # ---------------------------
         # Max Late fusion
         # ---------------------------
-        y_pred = np.argmax(np.concatenate(decisions, axis=1), axis=1).astype(np.int) % decisions[0].shape[1] + 1
+        y_pred = np.argmax(np.concatenate(decisions_max, axis=1), axis=1).astype(np.int) % decisions_max[0].shape[1] + 1
         save_results(y_true=yte, y_pred=y_pred,
                      verbose_string='Max Late fusion',
                      title='Max Late fusion on ' + subject,
@@ -346,12 +319,39 @@ def cross_evaluation(datasets, **kwargs):
     return scores
 
 
+args = parse_args()
+DATASET_ROOT = args.dataset_root if args.dataset_root is not None else CONFIGURATIONS.DATASET_ROOT
+
+EXPORT_LEAVE_ONE_OUT = args.export_leave_one_out
+EXPORT_OVERALL = args.export_overall
+CONFUSION_MATRIX = args.confusion_matrix
+CLASSIFICATION_REPORT = args.classification_report
+
+KINECT_TRAIN = args.kinect_train
+KINECT_TEST = args.kinect_test
+KERNEL_TYPE = args.kernels
+
+MODAL_1 = args.rgb
+MODAL_2 = args.depth
+ITER_1 = args.iter_rgb
+ITER_2 = args.iter_depth
+GESTURE_SUBDIR = os.path.join(MODAL_1 + '_' + str(ITER_1) + ' ' + MODAL_2 + '_' + str(ITER_2))
+
+gesture_datasets = [
+    datapersistant.persistGestureDataset(
+        os.path.join(DATASET_ROOT, MODAL_1 + '_' + KINECT_TRAIN + '_' + KINECT_TEST),
+        'gesture_' + MODAL_1 + '_' + KINECT_TRAIN + '_' + KINECT_TEST, ITER_1, False),
+    datapersistant.persistGestureDataset(
+        os.path.join(DATASET_ROOT, MODAL_2 + '_' + KINECT_TRAIN + '_' + KINECT_TEST),
+        'gesture_' + MODAL_2 + '_' + KINECT_TRAIN + '_' + KINECT_TEST, ITER_2, False)
+]
 '''
 Program begins
 '''
 for param in dir(CONFIGURATIONS):
     called_param = getattr(CONFIGURATIONS, str(param))
-    if isinstance(called_param, Params) and called_param.is_assignable(KERNEL_TYPE):
+    if isinstance(called_param, Params) and called_param.is_assignable(
+            KERNEL_TYPE) and KINECT_TRAIN in called_param.kinects:
         print('[MultiviewHandGestures MKL Classification]', called_param.name)
         print()
         result = cross_evaluation(gesture_datasets, **called_param.get_params())
